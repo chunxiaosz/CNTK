@@ -149,8 +149,10 @@ CNTK_WHEEL_PATH="cntk/python/$CNTK_WHEEL_NAME"
 if ! test -f "$CNTK_WHEEL_PATH"; then
   CNTK_WHEEL_PATH="$WHEEL_BASE_URL/$TARGET_CONFIGURATION/$CNTK_WHEEL_NAME"
 
-  wget -q --spider "$CNTK_WHEEL_PATH" ||
-    die "Python wheel not available locally and cannot reach $CNTK_WHEEL_PATH for Python\nwheel installation online. Please double-check Internet connectivity."
+  if ! test -f "$CNTK_WHEEL_PATH"; then
+    wget -q --spider "$CNTK_WHEEL_PATH" ||
+      die "Python wheel not available locally and cannot reach $CNTK_WHEEL_PATH for Python\nwheel installation online. Please double-check Internet connectivity."
+  fi
 
 fi
 
@@ -207,6 +209,8 @@ PY_ACTIVATE="$ANACONDA_PREFIX/bin/activate"
 PY_DEACTIVATE="$ANACONDA_PREFIX/bin/deactivate"
 [ -x "$PY_DEACTIVATE" ]
 
+# update `conda` to >= 4.3.30 before `conda install protobuf-3.6.0`
+$CONDA update conda -y
 CNTK_PY_ENV_NAME="cntk-py$PY_VERSION"
 CNTK_PY_ENV_PREFIX="$ANACONDA_PREFIX/envs/$CNTK_PY_ENV_NAME"
 if [ -d "$CNTK_PY_ENV_PREFIX" ]; then

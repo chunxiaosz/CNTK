@@ -1,60 +1,19 @@
 # CNTK Current Iteration
 
-## Change profiler details output format to be chrome://tracing
+## Highlights of this release
+* Moved to CUDA 10 for both Windows and Linux.
+* Support advance RNN loop in ONNX export.
+* Export larger than 2GB models in ONNX format.
 
-## Enable per-node timing. Working example [here](../Examples/Image/Classification/MLP/Python/SimpleMNIST.py)
-- per-node timing creates items in profiler details when profiler is enabled.
-- usage in Python:
-```
-import cntk as C
-C.debugging.debug.set_node_timing(True)
-C.debugging.start_profiler() # optional
-C.debugging.enable_profiler() # optional
-#<trainer|evaluator|function> executions
-<trainer|evaluator|function>.print_node_timing()
-C.debugging.stop_profiler()
-```
+## CNTK support for CUDA 10
 
-## CPU inference performance improvements using MKL
-- Accelerates some common tensor ops in Intel CPU inference for float32, especially for fully connected networks
-- Can be turned on/off by cntk.cntk_py.enable_cpueval_optimization()/cntk.cntk_py.disable_cpueval_optimization()
+CNTK now supports CUDA 10. This requires an update to build environment to Visual Studio 2017 v15.9 for Windows.
 
-## 1BitSGD incorporated into CNTK
-- 1BitSGD source code is now available with CNTK license (MIT license) under Source/1BitSGD/
-- 1bitsgd build target was merged into existing gpu target
+To setup build and runtime environment on Windows:
+* Install [Visual Studio 2017](https://www.visualstudio.com/downloads/). Note: going forward for CUDA 10 and beyond, it is no longer required to install and run with the specific VC Tools version 14.11.
+* Install [Nvidia CUDA 10](https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64)
+* From PowerShell, run:
+    [DevInstall.ps1](../Tools/devInstall/Windows/DevInstall.ps1)
+* Start Visual Studio 2017 and open [CNTK.sln](./CNTK.sln).
 
-## New loss function: hierarchical softmax (Thanks @yaochengji for the contribution!)
-
-## Distributed Training with Mulitple Learners
-- Trainer now accepts multiple parameter learners for distributed training. With this change, different parameters of a network can be learned by different learners in a single training session. This also facilitates distributed training for GANs. For more information, please refer to the [Basic_GAN_Distributed.py](../Examples/Image/GAN/Basic_GAN_Distributed.py) and the [cntk.learners.distributed_multi_learner_test.py](../bindings/python/cntk/learners/tests/distributed_multi_learner_test.py)
-
-## Operators
-- Added MeanVarianceNormalization operator. 
-
-## Bug fixes
-- Fixed convergence issue in Tutorial 201B
-- Fixed pooling/unpooling to support free dimension for sequences
-- Fixed crash in CNTKBinaryFormat deserializer when crossing sweep boundary
-- Fixed shape inference bug in RNN step function for scalar broadcasting
-- Fixed a build bug when mpi=no
-- Improved distributed training aggregation speed by increasing packing threshold, and expose the knob in V2
-- Fixed a memory leak in MKL layout
-- Fixed a bug in cntk.convert API in misc.converter.py, which prevents converting complex networks.
-
-## ONNX
-### Updates
-- CNTK exported ONNX models are now ONNX.checker compliant. 
-- Added ONNX support for CNTK’s OptimizedRNNStack operator (LSTM only).
-- Added support for LSTM and GRU operators
-- Added support for experimental ONNX op MeanVarianceNormalization.
-- Added support for experimental ONNX op Identity.
-- Added support for exporting CNTK’s LayerNormalization layer using ONNX MeanVarianceNormalization op.
-
-### Bug or minor fixes:
-- Axis attribute is optional in CNTK’s ONNX Concat operator.
-- Bug fix in ONNX broadcasting for scalars.
-- Bug fix in ONNX ConvTranspose operator. 
-- Backward compatibility bug fix in LeakyReLu (argument ‘alpha’ reverted to type double).
-
-## Misc
-- Added a new API ``find_by_uid()`` under ``cntk.logging.graph``. 
+To setup build and runtime environment on Linux using docker, please build Unbuntu 16.04 docker image using Dockerfiles [here](./Tools/docker). For other Linux systems, please refer to the Dockerfiles to setup dependent libraries for CNTK.

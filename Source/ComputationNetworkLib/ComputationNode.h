@@ -61,7 +61,8 @@
 #define CNTK_MODEL_VERSION_28 28 // Padding op
 #define CNTK_MODEL_VERSION_29 29 // Expose StopGradient in BS
 #define CNTK_MODEL_VERSION_30 30 // LatticeWithSequenceSoftmax node
-#define CURRENT_CNTK_MODEL_VERSION CNTK_MODEL_VERSION_30
+#define CNTK_MODEL_VERSION_31 31 // Cast node
+#define CURRENT_CNTK_MODEL_VERSION CNTK_MODEL_VERSION_31
 
 // helper mode for debugging
 // If TRACK_GAP_NANS is defined then initialize layout gaps to NaN and do NaN checks. Also do detailed logging of node computations.
@@ -95,6 +96,7 @@ struct /*interface*/ IComputationNode
     // TODO: OperationName calls static TypeName which does not match the actual type names in that the 'Node' is missing.
     virtual const std::wstring OperationName() const = 0;
 #define OperationNameOf(T) (T<float>::TypeName()) // convenience macro
+#define OperationName2Of(T) (T<double,float>::TypeName()) // convenience macro
 
     virtual void UpdateFunctionMBSize() = 0; // recalculate our column dimensions from MBLayout. Override to update temps.
 
@@ -1835,9 +1837,9 @@ public:
     virtual std::set<std::pair<const MatrixBase*, std::wstring>> GetMatrixInfo() const override
     {
         std::set<std::pair<const MatrixBase*, std::wstring>> matrixInfo;
-        matrixInfo.insert    (make_pair(ValuePtr().get(),    NodeName() + L" : " + msra::strfun::utf16(ShapeDescription())));
+        matrixInfo.insert(make_pair(ValuePtr().get(), NodeName() + L" : " + Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(ShapeDescription())));
         if (GradientPtr())
-            matrixInfo.insert(make_pair(GradientPtr().get(), NodeName() + L" : " + msra::strfun::utf16(ShapeDescription()) + L" (gradient)"));
+            matrixInfo.insert(make_pair(GradientPtr().get(), NodeName() + L" : " + Microsoft::MSR::CNTK::ToFixedWStringFromMultiByte(ShapeDescription()) + L" (gradient)"));
         return matrixInfo;
     }
 
